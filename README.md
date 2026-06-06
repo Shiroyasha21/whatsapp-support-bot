@@ -1,36 +1,36 @@
 # 🤖 WhatsApp Support Bot
 
-A fully functional WhatsApp chatbot that simulates a real-world customer support system — built for portfolio demonstration. Customers can check their product's warranty status and submit RMA or tech service tickets, all through a natural WhatsApp conversation.
+A fully functional WhatsApp chatbot that simulates a real-world customer support system, built for portfolio demonstration. Customers can check their product's warranty status and submit RMA or tech service tickets, all through a natural WhatsApp conversation.
 
 > **Live Demo:** Text `Hi` to **+63 976 501 5990** to interact with the bot.
-> *(If unavailable, see the [screen recording demo](#demo))*
+> *(If unavailable, see the screen recording demo below)*
 
 ---
 
 ## 📸 Demo
 
-> *(Screen recording to be added — shows full flow: warranty check → ticket submission → email confirmation)*
+> *(Screen recording to be added: full flow showing warranty check, ticket submission, and email confirmation)*
 
 ---
 
 ## 💡 The Idea
 
-Support bots like Lenovo's or Dell's warranty checker always fascinated me — you give it a serial number and it instantly tells you your warranty status, then offers to open a service ticket. I wanted to understand and build the architecture behind that from scratch.
+Support bots like Lenovo's or Dell's warranty checker always fascinated me. You give it a serial number and it instantly tells you your warranty status, then offers to open a service ticket. I wanted to understand and build that architecture from scratch.
 
-This project replicates that experience using entirely free tools — no paid APIs, no cloud subscription, no backend server costs.
+This project replicates that experience using entirely free tools: no paid APIs, no cloud subscription, no backend server costs.
 
 ---
 
 ## ✨ Features
 
-- **Guided conversation flow** — collects customer name, email, and contact number automatically
-- **Warranty lookup** — checks serial number against a product database, calculates expiry date and days remaining
-- **Handles all warranty states** — active, expired, and not found
-- **Support ticket submission** — customer chooses RMA (return/replace) or Tech Service (bring-in repair)
-- **Automated email confirmation** — sends a formatted ticket email to the customer instantly
-- **Session management** — tracks each user's conversation state independently, times out after 30 minutes
-- **Edge case handling** — filters spam, handles rapid messages, validates email format, enforces input limits
-- **RESTART command** — user can type RESTART at any point to begin a new inquiry
+- **Guided conversation flow:** collects customer name, email, and contact number automatically
+- **Warranty lookup:** checks serial number against a product database, calculates expiry date and days remaining
+- **Handles all warranty states:** active, expired, and not found
+- **Support ticket submission:** customer chooses RMA (return/replace) or Tech Service (bring-in repair)
+- **Automated email confirmation:** sends a formatted ticket email to the customer instantly
+- **Session management:** tracks each user's conversation state independently, times out after 30 minutes
+- **Edge case handling:** filters spam, handles rapid messages, validates email format, enforces input limits
+- **RESTART command:** user can type RESTART at any point to begin a new inquiry
 
 ---
 
@@ -62,10 +62,10 @@ Google Apps Script Web App  [FREE, hosted by Google]
 | Tool | Purpose | Why I chose it |
 |---|---|---|
 | **Node.js** | Bot runtime | JavaScript everywhere, large ecosystem |
-| **whatsapp-web.js** | WhatsApp connection | Best-maintained unofficial library, good docs |
-| **Puppeteer** | Headless Chrome (used by whatsapp-web.js) | Bundled, no separate setup needed |
-| **Google Sheets** | Product + ticket database | Free, visual, easy to manage — mirrors how a real DB works |
-| **Google Apps Script** | REST API + email sender | Replaces a paid backend entirely — free, hosted by Google, native Sheets access |
+| **whatsapp-web.js** | WhatsApp connection | Best-maintained unofficial library, active community |
+| **Puppeteer** | Headless Chrome (used internally by whatsapp-web.js) | Bundled, no separate setup needed |
+| **Google Sheets** | Product and ticket database | Free, visual, easy to manage, mirrors how a real DB works |
+| **Google Apps Script** | REST API and email sender | Replaces a paid backend entirely. Free, hosted by Google, with native Sheets access |
 | **MailApp (Apps Script)** | Email confirmation | Built into Apps Script, zero config, sends from Gmail |
 | **dotenv** | Environment variable management | Keeps sensitive URLs out of source code |
 
@@ -74,34 +74,39 @@ Google Apps Script Web App  [FREE, hosted by Google]
 ## 🧠 Key Design Decisions
 
 ### Why whatsapp-web.js over the Official WhatsApp Business API?
-The official Meta API requires business verification, a registered phone number, pre-approved message templates, and costs money per conversation. For a portfolio project, that's unnecessary overhead. `whatsapp-web.js` connects to WhatsApp Web's protocol directly — same infrastructure, no approval process, zero cost.
 
-**Trade-off acknowledged:** This uses an unofficial API that violates WhatsApp's ToS. A secondary number is used specifically to isolate any ban risk from the main account. For a real production system, the official API would be the correct choice.
+The official Meta API requires business verification, a registered phone number, pre-approved message templates, and charges per conversation. For a portfolio project, that overhead is unnecessary. `whatsapp-web.js` connects to WhatsApp Web's protocol directly: same infrastructure, no approval process, zero cost.
+
+**Trade-off acknowledged:** This uses an unofficial library that violates WhatsApp's ToS. A secondary number is used specifically to isolate any ban risk from the main account. For a real production system, the official API would be the right choice.
 
 ### Why Google Sheets as the database?
-Real support systems use internal databases (SQL, Oracle, etc.) where every serial number manufactured is recorded along with warranty tier and purchase data. Google Sheets mirrors this concept in a free, accessible format.
 
-It also makes the project transparent — anyone reviewing it can open the sheet and see the data structure immediately, which is valuable for a portfolio piece.
+Real support systems use internal databases where every serial number manufactured is recorded along with warranty tier and purchase data. Google Sheets mirrors this concept in a free, accessible format.
+
+It also makes the project transparent. Anyone reviewing it can open the sheet and immediately understand the data structure, which is a plus for a portfolio piece.
 
 ### Why Google Apps Script instead of the googleapis npm package?
-The `googleapis` package requires OAuth 2.0 setup — service account JSON files, credential management, and complex auth flows. Google Apps Script, deployed as a Web App, exposes a simple HTTPS endpoint that any `fetch()` call can hit.
 
-This also gives free email sending via `MailApp` with zero configuration — no SMTP setup, no SendGrid account, no Nodemailer. The Apps Script handles everything internally since it runs inside Google's ecosystem.
+The `googleapis` package requires OAuth 2.0 setup: service account JSON files, credential management, and complex auth flows. Google Apps Script, deployed as a Web App, exposes a simple HTTPS endpoint that any `fetch()` call can hit.
 
-### Why not host on Oracle Cloud (zero-cost VPS)?
-Oracle Cloud's Always Free tier was evaluated but rejected for this use case:
+This also provides free email sending via `MailApp` with zero configuration: no SMTP setup, no SendGrid account, no Nodemailer. The Apps Script handles everything internally since it runs inside Google's ecosystem.
 
-- **Idle suspension risk** — accounts with no activity for 30+ days can be flagged and terminated with no warning
-- **Account approval friction** — Oracle aggressively flags new accounts in some regions as potentially fraudulent
-- **Overkill for a demo** — a full Linux VPS setup adds 2-3 hours of configuration for a project whose primary goal is demonstrating the bot, not DevOps
+### Why not host on a cloud VPS (Oracle Cloud Always Free)?
 
-**Decision:** For portfolio showcasing, a screen recording of the live bot demonstrates the full flow more reliably and professionally than a live number that may go offline. A video also lets me control the narrative — showing exactly the scenarios I want, including all edge cases.
+Oracle Cloud's Always Free tier was evaluated but set aside for this use case:
+
+- **Idle suspension risk:** accounts with no activity for 30+ days can be flagged and terminated without warning
+- **Account approval friction:** Oracle aggressively reviews new accounts in some regions
+- **Scope mismatch:** a full Linux VPS setup adds hours of configuration for a project whose primary goal is demonstrating the bot itself, not DevOps
+
+For portfolio showcasing, a screen recording of the live bot demonstrates the full flow more reliably and professionally than a live number that may go offline. A recording also lets me control exactly which scenarios to present, including all edge cases.
 
 ---
 
 ## 🗄️ Database Structure
 
 ### Sheet 1: `products`
+
 Stores all product serial numbers with warranty information.
 
 | Column | Type | Description |
@@ -112,6 +117,7 @@ Stores all product serial numbers with warranty information.
 | `warranty_months` | Number | Warranty duration in months |
 
 ### Sheet 2: `tickets`
+
 Populated by the bot when customers submit support requests.
 
 | Column | Type | Description |
@@ -121,9 +127,9 @@ Populated by the bot when customers submit support requests.
 | `customer_name` | String | Collected during conversation |
 | `customer_email` | String | Collected during conversation |
 | `customer_phone` | String | Auto-captured from WhatsApp |
-| `serial_number` | String | Looked up product |
-| `product_name` | String | Looked up product name |
-| `issue_description` | String | Customer's description |
+| `serial_number` | String | Product serial number |
+| `product_name` | String | Product name |
+| `issue_description` | String | Customer's description of the issue |
 | `ticket_type` | String | RMA or Tech Service |
 | `status` | String | Default: Open |
 
@@ -148,26 +154,26 @@ Bot asks for serial number → checks Google Sheets
   ┌─────────────────────────────────┐
   │  WARRANTY ACTIVE                │
   │  → Shows product + expiry info  │
-  │  → Offers to submit ticket      │
+  │  → Offers to submit a ticket    │
   └─────────────────────────────────┘
         ↓
   ┌─────────────────────────────────┐
   │  WARRANTY EXPIRED               │
-  │  → Shows expired info           │
+  │  → Shows expiry info            │
   │  → Offers out-of-warranty       │
   │    service inquiry              │
   └─────────────────────────────────┘
         ↓ (if YES to ticket)
 Bot asks for issue description
         ↓
-Bot asks: 1 - RMA or 2 - Tech Service
+Bot asks: 1 for RMA or 2 for Tech Service
         ↓
 Ticket written to Google Sheets
 Email confirmation sent to customer
 Bot confirms with Ticket ID
         ↓
-Session ends — customer can send
-any message to start a new inquiry
+Session ends
+Customer can send any message to start a new inquiry
 ```
 
 ---
@@ -193,14 +199,14 @@ npm install
 
 ### 3. Set up Google Sheets
 - Create a new Google Spreadsheet
-- Import `data/products.csv` as the first sheet (rename to `products`)
+- Import `data/products.csv` as the first sheet and rename it `products`
 - Add a second sheet named `tickets` with the headers from `data/tickets.csv`
 
 ### 4. Deploy the Apps Script
-- Open your Google Sheet → Extensions → Apps Script
+- Open your Google Sheet, then go to Extensions > Apps Script
 - Paste the contents of `apps-script/Code.gs`
 - Deploy as Web App (Execute as: Me, Access: Anyone)
-- Copy the Web App URL
+- Copy the generated Web App URL
 
 ### 5. Configure environment
 ```bash
@@ -213,7 +219,7 @@ cp .env.example .env
 npm start
 ```
 
-Scan the QR code with your secondary WhatsApp number. The bot comes online.
+Scan the QR code with your secondary WhatsApp number. The bot comes online instantly.
 
 ---
 
@@ -221,14 +227,14 @@ Scan the QR code with your secondary WhatsApp number. The bot comes online.
 
 ```
 whatsapp-support-bot/
-├── index.js              # Bot entry point + full conversation state machine
+├── index.js              # Bot entry point and full conversation state machine
 ├── apps-script/
-│   └── Code.gs           # Google Apps Script (warranty check + ticket API + email)
+│   └── Code.gs           # Google Apps Script (warranty check, ticket API, email)
 ├── data/
 │   ├── products.csv      # Sample product data (20 Lenovo products)
 │   └── tickets.csv       # Empty tickets sheet with headers
 ├── .env.example          # Environment variable template
-├── .gitignore            # Excludes node_modules, session files, .env
+├── .gitignore            # Excludes node_modules, session files, and .env
 └── package.json
 ```
 
@@ -236,4 +242,4 @@ whatsapp-support-bot/
 
 ## ⚠️ Disclaimer
 
-This project uses `whatsapp-web.js`, an unofficial library not affiliated with WhatsApp or Meta. It is built for educational and portfolio purposes only. Use a secondary number — do not use your primary WhatsApp account.
+This project uses `whatsapp-web.js`, an unofficial library not affiliated with WhatsApp or Meta. It is built for educational and portfolio purposes only. Use a secondary number and do not use your primary WhatsApp account.
