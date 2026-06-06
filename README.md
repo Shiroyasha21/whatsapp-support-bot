@@ -91,6 +91,10 @@ The `googleapis` package requires OAuth 2.0 setup: service account JSON files, c
 
 This also provides free email sending via `MailApp` with zero configuration: no SMTP setup, no SendGrid account, no Nodemailer. The Apps Script handles everything internally since it runs inside Google's ecosystem.
 
+### How does the email sending work?
+
+The Apps Script runs under the Google account that owns the spreadsheet. When a ticket is submitted, the script calls `MailApp.sendEmail()`, which sends the confirmation email directly from that Google account's Gmail. No external email service is needed. This means whoever sets up the spreadsheet and deploys the Apps Script is the sender — the email will appear to come from their Gmail address.
+
 ### Why not host on a cloud VPS (Oracle Cloud Always Free)?
 
 Oracle Cloud's Always Free tier was evaluated but set aside for this use case:
