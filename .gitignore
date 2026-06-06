@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# WhatsApp session & cache (sensitive - never commit)
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Environment variables (contains your Apps Script URL)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
